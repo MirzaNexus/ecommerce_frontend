@@ -18,5 +18,5 @@ export const useAuthInit = () => {
     };
 
     init();
-  }, [token, setAuth, logout]); // ✅ add deps
+  }, [token, setAuth, logout]);
 };

@@ -1,15 +1,18 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
 
 export function useFetch<T>(
-  queryKey: any[],
+  queryKey: QueryKey,
   queryFn: () => Promise<T>,
-  options?: UseQueryOptions<T>,
+  options?: Omit<
+    UseQueryOptions<T, Error, T, QueryKey>,
+    "queryKey" | "queryFn"
+  >,
 ) {
-  return useQuery<T>({
+  return useQuery<T, Error>({
     queryKey,
     queryFn,
-    staleTime: 1000 * 60 * 5, // ✅ cache 5 min
-    retry: 1, // ✅ avoid spam
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
     refetchOnWindowFocus: false,
     ...options,
   });
