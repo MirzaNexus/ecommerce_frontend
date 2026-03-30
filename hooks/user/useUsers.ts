@@ -4,6 +4,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useFetch } from "@/hooks/useFetch";
 import { adminService } from "@/services/adminService";
 import { PaginatedUsersDTO, UserStatus } from "@/types/admin";
+import { keepPreviousData } from "@tanstack/react-query";
 
 interface UseUsersProps {
   page: number;
@@ -32,7 +33,7 @@ export const useUsers = ({
         ...(debouncedSearch ? { search: debouncedSearch } : {}),
       }),
     {
-      keepPreviousData: true, // ✅ smooth pagination
+      placeholderData: keepPreviousData,
       staleTime: 1000 * 60 * 5, // 5 mins caching
     },
   );
