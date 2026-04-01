@@ -15,7 +15,7 @@ export function useFetch<T>(
     queryKey,
     queryFn,
     staleTime: 1000 * 60 * 5,
-    retry: 1,
+    // retry: 1,
     refetchOnWindowFocus: false,
     ...options, // Ab yahan error nahi aayega
   });

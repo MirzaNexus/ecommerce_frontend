@@ -5,7 +5,11 @@ import { useUsers } from "@/hooks/user/useUsers";
 import FilterDropdown from "./FilterDropdown";
 import StatusToggle from "./StatusToggle";
 
-export default function UserTable() {
+export default function UserTable({
+  onRowClick,
+}: {
+  onRowClick?: (userId: string) => void;
+}) {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<any>();
 
@@ -34,13 +38,17 @@ export default function UserTable() {
         </thead>
 
         <tbody>
-          {data?.data.map((user) => (
-            <tr key={user.id} className="border-t">
+          {data?.data?.map((user) => (
+            <tr
+              key={user.id}
+              className="border-t cursor-pointer hover:bg-muted transition"
+              onClick={() => onRowClick?.(user.id)}
+            >
               <td>
                 {user.firstName} {user.lastName || ""}
               </td>
               <td>{user.email}</td>
-              <td>
+              <td onClick={(e) => e.stopPropagation()}>
                 <StatusToggle userId={user.id} status={user.status} />
               </td>
               <td>{user.role}</td>
@@ -52,18 +60,18 @@ export default function UserTable() {
       {/* Pagination */}
       <div className="flex justify-between">
         <button
-          disabled={data?.meta.page === 1}
+          disabled={data?.meta?.page === 1}
           onClick={() => setPage((p) => p - 1)}
         >
           Prev
         </button>
 
         <span>
-          Page {data?.meta.page} / {data?.meta.totalPages}
+          Page {data?.meta?.page} / {data?.meta?.totalPages}
         </span>
 
         <button
-          disabled={data?.meta.page === data?.meta.totalPages}
+          disabled={data?.meta?.page === data?.meta?.totalPages}
           onClick={() => setPage((p) => p + 1)}
         >
           Next

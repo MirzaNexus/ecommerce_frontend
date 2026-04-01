@@ -10,7 +10,7 @@ export const useUserDetail = (userId: string) => {
     () => adminService.getUserById(userId),
     {
       staleTime: 1000 * 60 * 5, // cache 5 minutes
-      retry: 1, // retry once
+      // retry: 1, // retry once
     },
   );
 };

@@ -6,7 +6,7 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutationHook(userService.updateProfile, {
-    retry: 2,
+    // retry: 1,
 
     onMutate: async (newData) => {
       await queryClient.cancelQueries({ queryKey: ["profile"] });

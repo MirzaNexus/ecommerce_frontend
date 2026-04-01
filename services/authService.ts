@@ -1,13 +1,19 @@
-import apiClient from "./apiClient";
+import { LoginPayload, AuthResponse } from "@/types/auth";
+import api from "./apiClient";
 
 export const authService = {
-  login: async (data: { email: string; password: string }) => {
-    const res = await apiClient.post("/auth/login", data);
-    return res.data;
+  login: async (payload: LoginPayload) => {
+    const res = await api.post("/auth/login", payload);
+    return res.data as AuthResponse;
   },
 
-  getProfile: async () => {
-    const res = await apiClient.get("/auth/me");
+  refresh: async (refreshToken: string) => {
+    const res = await api.post("/auth/refresh", { refreshToken });
+    return res.data as AuthResponse;
+  },
+
+  logout: async (refreshToken: string) => {
+    const res = await api.post("/auth/logout", { refreshToken });
     return res.data;
   },
 };

@@ -1,13 +1,11 @@
-export type User = {
-  id: string;
-  name: string;
+export interface LoginPayload {
   email: string;
-  role: "buyer" | "admin";
-};
+  password: string;
+  deviceId: string;
+}
 
-export type AuthState = {
-  user: User | null;
-  token: string | null;
-  setAuth: (user: User, token: string) => void;
-  logout: () => void;
-};
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: any;
+}

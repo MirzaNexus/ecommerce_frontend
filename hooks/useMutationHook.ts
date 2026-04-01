@@ -6,7 +6,7 @@ export function useMutationHook<TData, TVariables, TContext = unknown>(
 ) {
   return useMutation({
     mutationFn,
-    retry: 1,
+    // retry: 1,
     ...options,
   });
 }

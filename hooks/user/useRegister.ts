@@ -6,7 +6,7 @@ export const useRegister = () => {
   const router = useRouter();
 
   const mutation = useMutationHook(userService.registerBuyer, {
-    retry: 1,
+    // retry: 1,
 
     onSuccess: () => {
       showSuccess("Registration successful");
