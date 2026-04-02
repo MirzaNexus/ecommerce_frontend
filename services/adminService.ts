@@ -29,7 +29,7 @@ export const adminService = {
     id: string,
     status: UserStatus,
   ): Promise<AdminUserDTO> => {
-    const { data } = await apiClient.patch(`/api/admin/users/${id}/status`, {
+    const { data } = await apiClient.patch(`/admin/users/${id}/status`, {
       status,
     });
 
