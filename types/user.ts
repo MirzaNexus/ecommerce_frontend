@@ -2,7 +2,7 @@ export interface RegisterBuyer {
   firstName: string;
   lastName?: string;
   email: string;
-  phone?: string;
+  phone: string;
   password: string;
 }
 
@@ -11,7 +11,7 @@ export interface UserProfile {
   firstName: string;
   lastName?: string;
   email: string;
-  phone?: string;
+  phone: string;
   avatarUrl?: string;
 }
 

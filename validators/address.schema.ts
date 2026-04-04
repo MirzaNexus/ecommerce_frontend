@@ -1,34 +1,36 @@
 import { z } from "zod";
 
+const optionalString = (min = 2, max = 100) =>
+  z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? undefined : val))
+    .refine((val) => val === undefined || val.length >= min, {
+      message: `Must be at least ${min} characters`,
+    })
+    .refine((val) => val === undefined || val.length <= max, {
+      message: `Must be at most ${max} characters`,
+    })
+    .optional();
+
 export const addressSchema = z.object({
-  type: z.enum(["shipping", "billing"]).optional(),
+  type: z.enum(["shipping", "billing"]),
 
   line1: z
     .string()
     .min(3, "Address line must be at least 3 characters")
     .max(255, "Address line cannot exceed 255 characters"),
 
-  line2: z
-    .string()
-    .max(255, "Address line 2 cannot exceed 255 characters")
-    .optional(),
+  line2: optionalString(0, 255),
 
   city: z
     .string()
     .min(2, "City name must be at least 2 characters")
     .max(100, "City name cannot exceed 100 characters"),
 
-  state: z
-    .string()
-    .min(2, "State must be at least 2 characters")
-    .max(100, "State cannot exceed 100 characters")
-    .optional(),
+  state: optionalString(2, 100),
 
-  postalCode: z
-    .string()
-    .min(2, "Postal code is too short")
-    .max(20, "Postal code is too long")
-    .optional(),
+  postalCode: optionalString(2, 20),
 
   country: z
     .string()

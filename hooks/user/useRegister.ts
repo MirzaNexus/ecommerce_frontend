@@ -10,7 +10,7 @@ export const useRegister = () => {
 
     onSuccess: () => {
       showSuccess("Registration successful");
-      router.push("/login");
+      router.push("/auth/login");
     },
 
     onError: (error: any) => {

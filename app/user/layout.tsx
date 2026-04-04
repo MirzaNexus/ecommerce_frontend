@@ -2,7 +2,6 @@
 
 import Container from "@/components/layout/Container";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-
 const userSidebarItems = [
   {
     name: "Dashboard",

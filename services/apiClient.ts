@@ -41,39 +41,87 @@ const api = axios.create({
 
 // REQUEST INTERCEPTOR
 
-api.interceptors.request.use(async (config) => {
-  const { accessToken, refreshToken, setTokens, clearAuth } =
-    useAuthStore.getState();
+// api.interceptors.request.use(async (config) => {
+//   const { accessToken, refreshToken, setTokens, clearAuth } =
+//     useAuthStore.getState();
 
-  if (accessToken) {
-    // ✅ Check if access token expired (15 min)
-    if (isTokenExpired(accessToken) && refreshToken) {
-      try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-          { refreshToken },
-        );
+//   if (accessToken) {
+//     // ✅ Check if access token expired (15 min)
+//     if (isTokenExpired(accessToken) && refreshToken) {
+//       try {
+//         const res = await axios.post(
+//           `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+//           { refreshToken },
+//         );
 
-        const { accessToken: newAccess, refreshToken: newRefresh } = res.data;
+//         const { accessToken: newAccess, refreshToken: newRefresh } = res.data;
 
-        // ✅ Save new tokens (rotation)
-        setTokens(newAccess, newRefresh);
+//         // ✅ Save new tokens (rotation)
+//         setTokens(newAccess, newRefresh);
 
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${newAccess}`;
-      } catch (err) {
-        clearAuth();
-        window.location.href = "/login";
-        return Promise.reject(err);
-      }
-    } else {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${accessToken}`;
+//         config.headers = config.headers || {};
+//         config.headers.Authorization = `Bearer ${newAccess}`;
+//       } catch (err) {
+//         clearAuth();
+//         window.location.href = "/auth/login";
+//         return Promise.reject(err);
+//       }
+//     } else {
+//       config.headers = config.headers || {};
+//       config.headers.Authorization = `Bearer ${accessToken}`;
+//     }
+//   }
+
+//   return config;
+// });
+
+api.interceptors.request.use(
+  async (config) => {
+    // 1. Skip logic for Login and Register
+    if (
+      config.url?.includes("/auth/login") ||
+      config.url?.includes("/auth/register")
+    ) {
+      return config;
     }
-  }
 
-  return config;
-});
+    const { accessToken, refreshToken, setTokens, clearAuth } =
+      useAuthStore.getState();
+
+    // Baaki logic sirf tab chale jab user already logged in ho aur protected route hit kare
+    if (accessToken) {
+      if (isTokenExpired(accessToken) && refreshToken) {
+        // ... aapka refresh logic yahan rahega
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+            { refreshToken },
+          );
+          const { accessToken: newAccess, refreshToken: newRefresh } = res.data;
+          setTokens(newAccess, newRefresh);
+
+          config.headers = config.headers || {};
+          config.headers.Authorization = `Bearer ${newAccess}`;
+        } catch (err) {
+          if (config.url?.includes("/auth/logout")) {
+            return Promise.reject(err);
+          }
+          clearAuth();
+          if (typeof window !== "undefined") {
+            window.location.href = "/auth/login";
+          }
+          return Promise.reject(err);
+        }
+      } else {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 // RESPONSE INTERCEPTOR
 
@@ -81,38 +129,44 @@ api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
+    originalRequest._retry = true;
 
-    // ✅ Network error (no response)
     if (!error.response) {
-      console.error("Network error / server down");
       return Promise.reject(error);
     }
 
-    // ✅ Handle 401
     if (error.response.status === 401 && !originalRequest._retry) {
+      if (originalRequest.url?.includes("/auth/refresh")) {
+        useAuthStore.getState().clearAuth();
+        if (typeof window !== "undefined") window.location.href = "/auth/login";
+        return Promise.reject(error);
+      }
+
       const { refreshToken, setTokens, clearAuth } = useAuthStore.getState();
 
       if (!refreshToken) {
         clearAuth();
-        window.location.href = "/login";
+        if (typeof window !== "undefined") window.location.href = "/auth/login";
         return Promise.reject(error);
       }
 
-      // 🔁 Queue handling
+      // 🔁 Concurrent Request Handling
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers = originalRequest.headers || {};
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        });
+        })
+          .then((token) => {
+            (originalRequest.headers as any).Authorization = `Bearer ${token}`;
+            return api(originalRequest); // Retry failed request
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
+        // Use standard axios for refresh to avoid interceptor recursion
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
           { refreshToken },
@@ -120,21 +174,18 @@ api.interceptors.response.use(
 
         const { accessToken, refreshToken: newRefresh } = res.data;
 
-        // ✅ Rotate tokens (VERY IMPORTANT)
+        // ✅ Centralized Store update (Updates State + Cookies + LocalStorage)
         setTokens(accessToken, newRefresh);
 
         processQueue(null, accessToken);
 
-        originalRequest.headers = originalRequest.headers || {};
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
+        (originalRequest.headers as any).Authorization =
+          `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-
         clearAuth();
-        window.location.href = "/login";
-
+        if (typeof window !== "undefined") window.location.href = "/auth/login";
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Address } from "@/types/address";
 import {
   useDeleteAddress,
@@ -16,8 +17,6 @@ interface Props {
 export default function AddressCard({ address }: Props) {
   const setDefault = useSetDefaultAddress();
   const deleteAddress = useDeleteAddress();
-  const [editOpen, setEditOpen] = useState(false);
-
   const handleSetDefault = () => {
     setDefault.mutate(address.id, {
       onSuccess: () => showSuccess("Default updated"),
@@ -61,14 +60,11 @@ export default function AddressCard({ address }: Props) {
         >
           {setDefault.isPending ? "Setting..." : "Set Default"}
         </button>
-
-        <button
-          onClick={() => setEditOpen(true)}
-          className="px-3 py-1 bg-yellow-500 text-white rounded"
-        >
-          Edit
-        </button>
-
+        <Link href={`/user/address/${address.id}`}>
+          <button className="px-3 py-1 bg-yellow-500 text-white rounded">
+            Edit
+          </button>
+        </Link>
         <button
           onClick={handleDelete}
           disabled={deleteAddress.isPending}
@@ -77,10 +73,6 @@ export default function AddressCard({ address }: Props) {
           {deleteAddress.isPending ? "Deleting..." : "Delete"}
         </button>
       </div>
-
-      {editOpen && (
-        <AddressForm initialData={address} onClose={() => setEditOpen(false)} />
-      )}
     </div>
   );
 }

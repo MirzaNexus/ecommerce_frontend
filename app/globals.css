@@ -1,5 +1,5 @@
-@tailwind base;
-@tailwind components;
+/* @tailwind base;
+@tailwind components; */
 @tailwind utilities;
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -131,5 +131,17 @@
 
   a {
     @apply text-primary hover:opacity-80 transition;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

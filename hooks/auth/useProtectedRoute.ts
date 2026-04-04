@@ -12,11 +12,11 @@ export const useProtectedRoute = (allowedRoles?: Role[]) => {
     if (isInitializing) return;
 
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.replace("/auth/login");
       return;
     }
 
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    if (allowedRoles && user && !allowedRoles.includes(user?.role)) {
       router.replace("/unauthorized");
     }
   }, [isAuthenticated, user, allowedRoles, router, isInitializing]);

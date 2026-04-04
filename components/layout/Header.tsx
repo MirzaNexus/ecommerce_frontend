@@ -5,10 +5,11 @@ import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
 import Logo from "./Logo";
 import NavIcons from "./NavIcons";
-
+import { useAuthStore } from "@/store/authStore";
 type HeaderProps = Readonly<{}>;
 
 export default function Header(_: HeaderProps) {
+  const { isAuthenticated } = useAuthStore();
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b">
       <Container>
@@ -16,7 +17,7 @@ export default function Header(_: HeaderProps) {
           <MobileNav />
           <Logo />
           <DesktopNav />
-          <NavIcons />
+          <NavIcons loggedIn={isAuthenticated} />
         </div>
       </Container>
     </header>

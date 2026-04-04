@@ -1,6 +1,8 @@
 import { useMutationHook } from "@/hooks/useMutationHook";
 import { userService } from "@/services/userService";
 import { useQueryClient } from "@tanstack/react-query";
+import { sanitize } from "@/utils/sanitizer";
+import { UserProfile } from "@/types/user";
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -13,9 +15,10 @@ export const useUpdateProfile = () => {
 
       const previousProfile = queryClient.getQueryData(["profile"]);
 
+      const sanitized = sanitize(newData) as UserProfile;
       queryClient.setQueryData(["profile"], (old: any) => ({
         ...old,
-        ...newData,
+        ...sanitized,
       }));
 
       return { previousProfile };

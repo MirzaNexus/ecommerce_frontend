@@ -8,9 +8,6 @@ export const useLogin = () => {
   return useMutationHook(authService.login, {
     onSuccess: (data) => {
       setAuth(data);
-
-      document.cookie = `refreshToken=${data.refreshToken}; path=/`;
-      document.cookie = `role=${data.user.role}; path=/`;
     },
   });
 };

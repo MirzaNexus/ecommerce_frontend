@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 type Item = {
   name: string;
@@ -10,6 +12,12 @@ type Item = {
 
 export default function DashboardSidebar({ items }: { items: Item[] }) {
   const pathname = usePathname();
+  const [userRole, setUserRole] = useState("Panel");
+
+  useEffect(() => {
+    const userRole = Cookies.get("role");
+    setUserRole(userRole as any);
+  }, [userRole]);
 
   return (
     <>
@@ -30,7 +38,9 @@ export default function DashboardSidebar({ items }: { items: Item[] }) {
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:block w-64 bg-card border border-border rounded-xl p-4">
-        <h2 className="text-lg font-semibold mb-4">Admin Panel</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          {userRole === "buyer" ? "Buyer Panel" : "Admin Panel"}
+        </h2>
 
         <nav className="flex flex-col gap-2">
           {items.map((item) => (

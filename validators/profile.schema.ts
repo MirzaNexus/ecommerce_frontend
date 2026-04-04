@@ -1,7 +1,17 @@
 import { z } from "zod";
 
-const optionalString = (schema: z.ZodString) =>
-  schema.optional().transform((val) => (val === "" ? undefined : val));
+const optionalString = (min = 2, max = 100) =>
+  z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? undefined : val))
+    .refine((val) => val === undefined || val.length >= min, {
+      message: `Must be at least ${min} characters`,
+    })
+    .refine((val) => val === undefined || val.length <= max, {
+      message: `Must be at most ${max} characters`,
+    })
+    .optional();
 
 export const profileSchema = z.object({
   firstName: z
@@ -9,14 +19,12 @@ export const profileSchema = z.object({
     .min(2, "First name must be at least 2 characters")
     .max(100),
 
-  lastName: optionalString(
-    z.string().min(2, "Last name must be at least 2 characters").max(100),
-  ),
+  lastName: optionalString(2, 20),
 
-  phone: optionalString(
-    z.string().min(7, "Phone number must be at least 7 digits").max(20),
-  ),
+  phone: z
+    .string()
+    .regex(/^(\+92|0)?3\d{9}$/, "Invalid Pakistani phone number"),
 
-  avatarUrl: optionalString(z.string().url("Please enter a valid image URL")),
+  avatarUrl: optionalString(2, 20),
 });
 export type ProfileFormValues = z.input<typeof profileSchema>;

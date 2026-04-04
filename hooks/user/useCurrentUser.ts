@@ -4,7 +4,7 @@ import { UserProfile } from "@/types/user";
 
 export function useCurrentUser() {
   // Simple: key as array, API call
-  const query = useFetch<UserProfile>(["current-user"], userService.getProfile);
+  const query = useFetch<UserProfile>(["profile"], userService.getProfile);
 
   return {
     user: query.data, // User data

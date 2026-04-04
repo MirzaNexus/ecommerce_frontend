@@ -11,10 +11,7 @@ type NavIconsProps = Readonly<{
   loggedIn?: boolean; // true if user is logged in
 }>;
 
-export default function NavIcons({
-  cartCount = 0,
-  loggedIn = false,
-}: NavIconsProps) {
+export default function NavIcons({ cartCount = 0, loggedIn }: NavIconsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const logout = useLogout();
 

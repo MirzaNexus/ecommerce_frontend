@@ -1,33 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import UserTable from "@/components/user/admin/UserTable";
 import UserDetailCard from "@/components/user/admin/UserDetailCard";
 
 export default function AdminUsersPage() {
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // URL se userId utha rahy hain
+  const selectedUserId = searchParams.get("userId");
+
+  const handleBack = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("userId");
+    router.push(`?${params.toString()}`);
+  };
 
   return (
-    <div>
+    <div className="p-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex justify-start items-center mb-6 border-b pb-4">
-        <h1 className="text-xl font-semibold">User Management</h1>
+      <div className="flex justify-between items-center mb-8 border-b border-border pb-5">
+        <div>
+          <h1 className="text-2xl font-heading font-bold text-foreground">
+            {selectedUserId ? "User Profile Details" : "User Management"}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {selectedUserId
+              ? "View and manage specific user information and account status."
+              : "Manage your application users, roles, and account permissions."}
+          </p>
+        </div>
       </div>
 
-      {/* Table */}
-      <UserTable onRowClick={(id) => setSelectedUserId(id)} />
-
-      {/* Inline Detail (same page) */}
-      {selectedUserId && (
-        <div className="mt-6 border-t pt-4">
+      {/* Logic: Agar userId hai tu Table hide ho jaye aur Detail show ho */}
+      {!selectedUserId ? (
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+          <UserTable />
+        </div>
+      ) : (
+        <div className="space-y-6">
           <button
-            onClick={() => setSelectedUserId(null)}
-            className="mb-4 text-sm underline"
+            onClick={handleBack}
+            className="flex items-center text-sm font-medium text-primary hover:text-accent transition-colors gap-2 group"
           >
-            ← Back
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ←
+            </span>
+            Back to Users List
           </button>
 
-          <UserDetailCard userId={selectedUserId} />
+          <div className="animate-in slide-in-from-bottom-4 duration-500">
+            <UserDetailCard userId={selectedUserId} />
+          </div>
         </div>
       )}
     </div>

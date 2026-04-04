@@ -7,6 +7,7 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
   SheetClose,
@@ -46,6 +47,9 @@ export default function MobileNav() {
           {/* Sheet Header with Title + Close Button */}
           <SheetHeader className="flex items-center justify-between mb-8">
             <SheetTitle className="text-lg font-semibold">Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigate through the application using the links below.
+            </SheetDescription>
           </SheetHeader>
 
           {/* Navigation Links */}

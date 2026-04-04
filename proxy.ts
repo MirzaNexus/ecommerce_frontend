@@ -20,7 +20,7 @@ export function proxy(request: NextRequest) {
 
   if (matchedRoute) {
     if (!refreshToken) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
     if (matchedRoute.roles && role && !matchedRoute.roles.includes(role)) {
