@@ -1,16 +1,29 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-
+import {
+  useQuery,
+  QueryKey,
+  UndefinedInitialDataOptions,
+} from "@tanstack/react-query";
+import { useAuthStore } from "@/store/authStore";
 export function useFetch<T>(
-  queryKey: any[],
+  queryKey: QueryKey,
   queryFn: () => Promise<T>,
-  options?: UseQueryOptions<T>,
+  options?: Omit<
+    UndefinedInitialDataOptions<T, Error, T, QueryKey>,
+    "queryKey" | "queryFn"
+  >,
 ) {
-  return useQuery<T>({
+  const isInitializing = useAuthStore((s) => s.isInitializing);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  return useQuery<T, Error>({
     queryKey,
     queryFn,
-    staleTime: 1000 * 60 * 5, // ✅ cache 5 min
-    retry: 1, // ✅ avoid spam
+    staleTime: 1000 * 60 * 5,
+    // retry: 1,
     refetchOnWindowFocus: false,
-    ...options,
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled
+        : !isInitializing && isAuthenticated,
+    ...options, // Ab yahan error nahi aayega
   });
 }

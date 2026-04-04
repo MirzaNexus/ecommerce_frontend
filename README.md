@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+<!--
+
+User
+http://localhost:3000/users/register
+get http://localhost:3000/users/me
+patch http://localhost:3000/users/me
+
+Auth
+post http://localhost:3000/auth/login
+post http://localhost:3000/auth/refresh
+post http://localhost:3000/auth/logout
+
+
+Address
+post http://localhost:3000/users/me/addresses
+patch http://localhost:3000/users/me/addresses/78d91469-d887-4c74-b956-900d744c1f09
+delete http://localhost:3000/users/me/addresses/78d91469-d887-4c74-b956-900d744c1f09
+get http://localhost:3000/users/me/addresses
+patch http://localhost:3000/users/me/addresses/78d91469-d887-4c74-b956-900d744c1f09/default
+
+Aadmin
+get http://localhost:3000/admin/users?page=1&limit=20&status=active
+get http://localhost:3000/admin/users/51ae106e-16c9-4207-9b55-f353cf35bbd2
+patch http://localhost:3000/admin/users/51ae106e-16c9-4207-9b55-f353cf35bbd2/status
+
+ -->
