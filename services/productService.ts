@@ -1,5 +1,13 @@
-import { PaginatedProducts } from "../types/product.types";
-import apiClient from "./apiClient";
+import api from "./apiClient";
+
+import {
+  PaginatedProducts,
+  Product,
+  ProductQueryParams,
+  ProductStatus,
+} from "@/types/product.types";
+
+import { deepSanitize } from "@/utils/sanitizer";
 
 const BASE_URL = "/products";
 
@@ -11,54 +19,78 @@ export async function fetchProducts(params: {
   status?: string;
   categoryId?: string;
 }) {
-  const res = await apiClient.get<PaginatedProducts>(BASE_URL, {
+  const res = await api.get<PaginatedProducts>(BASE_URL, {
     params,
   });
 
   return res.data;
 }
 
-/* -------------------- CREATE PRODUCT -------------------- */
-export async function createProduct(formData: FormData) {
-  const res = await apiClient.post(BASE_URL, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const productApi = {
+  /**
+   * Fetch products for Admin with server-side filtering and pagination
+   */
+  getAdminProducts: async (
+    params: ProductQueryParams,
+  ): Promise<PaginatedProducts> => {
+    const cleanParams = deepSanitize(params);
+    const { data } = await api.get<PaginatedProducts>("/products", {
+      params: cleanParams,
+    });
+    return data;
+  },
 
-  return res.data;
-}
+  /**
+   * Fetch a single product by ID
+   */
+  getProductById: async (id: string): Promise<Product> => {
+    const { data } = await api.get<Product>(`/products/${id}`);
+    return data;
+  },
 
-/* -------------------- UPDATE PRODUCT -------------------- */
-export async function updateProduct(
-  id: string,
-  data: FormData | Record<string, any>,
-) {
-  const isFormData = data instanceof FormData;
+  /**
+   * Create Product (Multipart/FormData)
+   */
+  createProduct: async (formData: FormData): Promise<Product> => {
+    const { data } = await api.post<Product>("/products", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  },
 
-  const res = await apiClient.put(`${BASE_URL}/${id}`, data, {
-    headers: isFormData
-      ? { "Content-Type": "multipart/form-data" }
-      : { "Content-Type": "application/json" },
-  });
+  /**
+   * Update Product Core Data
+   */
+  updateProduct: async (id: string, formData: FormData): Promise<Product> => {
+    const { data } = await api.put<Product>(`/products/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  },
 
-  return res.data;
-}
+  /**
+   * Toggle between DRAFT and PUBLISHED
+   */
+  toggleStatus: async (id: string): Promise<Product> => {
+    const { data } = await api.patch<Product>(`/products/${id}/toggle-status`);
+    return data;
+  },
 
-/* -------------------- DELETE PRODUCT -------------------- */
-export async function deleteProduct(id: string) {
-  const res = await apiClient.delete(`${BASE_URL}/${id}`);
-  return res.data;
-}
+  /**
+   * Soft delete / Archive
+   */
+  archiveProduct: async (id: string): Promise<{ message: string }> => {
+    const { data } = await api.patch<{ message: string }>(
+      `/products/${id}/archive`,
+    );
+    return data;
+  },
 
-/* -------------------- TOGGLE STATUS -------------------- */
-export async function toggleProductStatus(id: string) {
-  const res = await apiClient.patch(`${BASE_URL}/${id}/toggle-status`);
-  return res.data;
-}
-
-/* -------------------- ARCHIVE PRODUCT -------------------- */
-export async function archiveProduct(id: string) {
-  const res = await apiClient.patch(`${BASE_URL}/${id}/archive`);
-  return res.data;
-}
+  /**
+   * Full delete
+   */
+  deleteProduct: async (id: string): Promise<{ message: string }> => {
+    const { data } = await api.delete<{ message: string }>(`/products/${id}`);
+    return data;
+  },
+};

@@ -1,40 +1,45 @@
-import { ProductFormValues } from "@/validators/product/product.schema";
+import { ProductFormValues } from "@/types/product.types";
 
 export function buildProductFormData(data: ProductFormValues) {
   const formData = new FormData();
 
-  // Main image
-  formData.append("mainImage", data.image);
-
-  // Variants images
-  data.variants.forEach((variant) => {
-    if (variant.image) {
-      formData.append("variantImages", variant.image);
-    }
-  });
-
-  // Prepare variants JSON (remove File)
-  const variantsPayload = data.variants.map((v) => ({
-    sku: v.sku,
-    price: v.price,
-    stock: v.stock ?? 0,
-    attributes: v.attributes,
-  }));
-
-  formData.append("variants", JSON.stringify(variantsPayload));
-
-  // Append other fields
   formData.append("name", data.name);
-  if (data.description) formData.append("description", data.description);
+  formData.append("description", data.description ?? "");
   formData.append("categoryId", data.categoryId);
 
-  if (data.basePrice !== undefined) {
-    formData.append("basePrice", String(data.basePrice));
+  // ✅ FIX: use image (NOT imageFile)
+  if (data.image) {
+    formData.append("mainImage", data.image);
   }
 
-  if (data.slug) formData.append("slug", data.slug);
+  const cleanedVariants = data.variants.map((v) => ({
+    sku: v.sku,
+    price: Number(v.price),
+    stock: Number(v.stock),
 
-  if (data.status) formData.append("status", data.status);
+    attributes: {
+      color: v.attributes?.color,
+      size: v.attributes?.size,
+      material: v.attributes?.material,
+      weight: v.attributes?.weight,
+      dimensions: v.attributes?.dimensions
+        ? {
+            height: Number(v.attributes.dimensions.height),
+            width: Number(v.attributes.dimensions.width),
+            length: Number(v.attributes.dimensions.length),
+          }
+        : undefined,
+    },
+  }));
+
+  formData.append("variants", JSON.stringify(cleanedVariants));
+
+  // ✅ FIX: use image (NOT imageFile)
+  data.variants.forEach((v) => {
+    if (v.image) {
+      formData.append("variantImages", v.image);
+    }
+  });
 
   return formData;
 }

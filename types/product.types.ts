@@ -1,5 +1,3 @@
-export type UUID = string;
-
 export enum ProductStatus {
   DRAFT = "draft",
   PUBLISHED = "published",
@@ -11,6 +9,7 @@ export interface Dimensions {
   width: number;
   length: number;
 }
+
 export interface VariantAttributes {
   color?: string;
   size?: string;
@@ -19,34 +18,32 @@ export interface VariantAttributes {
   dimensions?: Dimensions;
 }
 
-export interface Variant {
-  id?: UUID;
-  productId?: UUID;
+export interface ProductVariant {
+  id: string;
   sku: string;
   price: number;
-  image?: File | null;
-  imageUrl?: string;
   stock?: number;
-  attributes?: VariantAttributes;
+  imageUrl?: string;
+  attributes: VariantAttributes;
 }
 
 export interface Product {
-  id?: UUID;
+  id: string;
   name: string;
   description?: string;
-  categoryId: UUID;
-  isPublished?: boolean;
-  status?: ProductStatus;
-  basePrice?: number;
-  slug?: string;
-  image?: File | null;
-  imageUrl?: string;
-  variants: Variant[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  categoryId: string;
+  categoryName?: string;
+  isPublished: boolean;
+  status: ProductStatus;
+  basePrice: number;
+  slug: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  variants?: ProductVariant[];
 }
 
-export interface PaginationMeta {
+export interface ProductPaginationMeta {
   total: number;
   page: number;
   limit: number;
@@ -55,5 +52,14 @@ export interface PaginationMeta {
 
 export interface PaginatedProducts {
   data: Product[];
-  meta: PaginationMeta;
+  meta: ProductPaginationMeta;
+}
+
+export interface ProductQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: ProductStatus;
+  categoryId?: string;
+  isPublished?: boolean;
 }

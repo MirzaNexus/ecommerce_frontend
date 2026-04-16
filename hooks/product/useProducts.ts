@@ -2,7 +2,6 @@
 
 import { useFetch } from "@/hooks/useFetch";
 import { fetchProducts } from "@/services/productService";
-import { useMemo } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 
 interface UseProductsParams {
@@ -13,10 +12,37 @@ interface UseProductsParams {
   categoryId?: string;
 }
 
-export function useProducts(params: UseProductsParams) {
-  const queryKey = useMemo(() => ["products", params], [params]);
+export function useProducts({
+  page,
+  limit,
+  search,
+  status,
+  categoryId,
+}: UseProductsParams) {
+  const VALID_STATUS = ["draft", "published", "archived"];
 
-  return useFetch(queryKey, () => fetchProducts(params), {
-    placeholderData: keepPreviousData,
-  });
+  const safeStatus = VALID_STATUS.includes(status || "") ? status : undefined;
+
+  return useFetch(
+    [
+      "products",
+      page,
+      limit,
+      search ?? null,
+      safeStatus ?? null,
+      categoryId ?? null,
+    ],
+    () =>
+      fetchProducts({
+        page,
+        limit,
+        search: search || undefined,
+        status: safeStatus,
+        categoryId: categoryId || undefined,
+      }),
+    {
+      placeholderData: keepPreviousData,
+      refetchOnWindowFocus: false,
+    },
+  );
 }

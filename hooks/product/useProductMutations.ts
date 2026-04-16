@@ -1,20 +1,14 @@
 "use client";
 
 import { useMutationHook } from "@/hooks/useMutationHook";
-import {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  toggleProductStatus,
-  archiveProduct,
-} from "@/services/productService";
+import { productApi } from "@/services/productService";
 import { useQueryClient } from "@tanstack/react-query";
 
 /* -------------------- CREATE -------------------- */
 export function useCreateProduct() {
   const queryClient = useQueryClient();
 
-  return useMutationHook(createProduct, {
+  return useMutationHook(productApi.createProduct, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -26,7 +20,8 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutationHook(
-    ({ id, data }: { id: string; data: any }) => updateProduct(id, data),
+    ({ id, data }: { id: string; data: any }) =>
+      productApi.updateProduct(id, data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -39,7 +34,7 @@ export function useUpdateProduct() {
 export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
-  return useMutationHook(deleteProduct, {
+  return useMutationHook(productApi.deleteProduct, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -50,18 +45,18 @@ export function useDeleteProduct() {
 export function useToggleProductStatus() {
   const queryClient = useQueryClient();
 
-  return useMutationHook(toggleProductStatus, {
+  return useMutationHook(productApi.toggleStatus, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 }
 
-/* -------------------- ARCHIVE -------------------- */
+/* -------------------- ARCHIVE ---------------- */
 export function useArchiveProduct() {
   const queryClient = useQueryClient();
 
-  return useMutationHook(archiveProduct, {
+  return useMutationHook(productApi.archiveProduct, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
