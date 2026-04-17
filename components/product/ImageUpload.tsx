@@ -90,3 +90,9 @@ export default function FileUpload({
     </div>
   );
 }
+
+// // Is line ko change karein:
+// src={
+//   preview ||
+//   (value instanceof File ? URL.createObjectURL(value) : (typeof value === "string" ? value : ""))
+// }

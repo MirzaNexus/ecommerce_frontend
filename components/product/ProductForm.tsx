@@ -36,6 +36,7 @@ export default function ProductForm({ onSubmit, isLoading }: ProductFormProps) {
     defaultValues: {
       name: "",
       description: "",
+      categoryId: "",
       basePrice: 0,
       variants: [{ sku: "", price: 0, stock: 0 }],
     },
@@ -76,12 +77,17 @@ export default function ProductForm({ onSubmit, isLoading }: ProductFormProps) {
               <CategorySelect control={form.control as any} name="categoryId" />
               <FormField
                 control={form.control}
-                name="categoryId"
+                name="basePrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category UUID</FormLabel>
+                    <FormLabel>Base Price ($)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Paste Category ID" {...field} />
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

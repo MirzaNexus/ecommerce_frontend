@@ -24,7 +24,7 @@ import ProductEditForm from "@/components/product/EditProductModal";
 import { Product } from "@/types/product.types";
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Package } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -95,21 +95,28 @@ export default function ProductListPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">
+      {/* --- Section 1: Header Section --- */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-[0.2em]">
+            <Package size={16} />
+            <span>Inventory Management</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
             Products
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your inventory, pricing, and product visibility.
+          <p className="text-slate-500 font-medium max-w-md leading-relaxed">
+            Organize your collection, manage stock levels, and control your
+            store's visibility.
           </p>
         </div>
+
         <Button
           onClick={() => router.push("/admin/products/create")}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
+          className="bg-slate-900 text-white hover:bg-indigo-600 px-8 py-7 rounded-[1.5rem] font-black shadow-2xl shadow-slate-200 transition-all gap-3 text-base group"
         >
-          <Plus className="mr-2 h-4 w-4" /> Add New Product
+          <Plus className="group-hover:rotate-90 transition-transform duration-300" />
+          Add New Product
         </Button>
       </div>
 

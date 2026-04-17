@@ -27,7 +27,7 @@ export const productSchema = z.object({
   name: z.string().min(3),
   description: z.string().optional().default(""),
   categoryId: z.string().uuid(),
-  basePrice: z.coerce.number().min(0).default(0),
+  basePrice: z.coerce.number().min(0),
   slug: z.string().optional().default(""),
   mainImage: z.any().optional(),
   variants: z.array(variantSchema).min(1),
