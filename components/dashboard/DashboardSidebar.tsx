@@ -35,7 +35,7 @@ export default function DashboardSidebar({ items }: { items: Item[] }) {
 
   useEffect(() => {
     const role = Cookies.get("role");
-    setUserRole(role || "User");
+    setUserRole(role || "admin");
   }, []);
 
   return (
