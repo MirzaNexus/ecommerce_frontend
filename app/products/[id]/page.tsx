@@ -1,31 +1,35 @@
 "use client";
 
-import React, { useState, useMemo, use } from "react"; // 1. 'use' hook import karein
+import React, { useState, useMemo, use } from "react";
 import { useProduct } from "@/hooks/product/useProduct";
+import { useCartStore } from "@/store/useCartStore"; // Import Store
 import { ImageGallery } from "@/components/product-browsing/ImageGallery";
 import { ProductInfo } from "@/components/product-browsing/ProductInfo";
 import { VariantSelector } from "@/components/product-browsing/VariantSelector";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ProductDetailSkeleton } from "@/components/product-browsing/ProductDetailSkeleton";
+import { CartDrawer } from "@/components/product-browsing/CartDrawer";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Minus, Plus, ShoppingBag, ShieldCheck, Truck } from "lucide-react";
+import { toast } from "sonner";
 
-// 2. Props mein params ko Promise define karein
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function ProductDetailPage({ params }: ProductPageProps) {
-  // 3. use() hook ke zariye params unwrap karein
   const unwrappedParams = use(params);
   const id = unwrappedParams.id;
-
   const { data: product, isLoading, isError } = useProduct(id);
+  const addItem = useCartStore((state) => state.addItem);
 
-  // Local state for selected variant attributes
+  const [quantity, setQuantity] = useState(1);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>(
     {},
   );
 
-  // Memoized: Find the exact variant based on selected attributes
   const selectedVariant = useMemo(() => {
     if (!product?.variants) return null;
     return product.variants.find((v) =>
@@ -36,90 +40,183 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     );
   }, [selectedAttrs, product]);
 
-  const handleAttrChange = (key: string, value: string) => {
-    setSelectedAttrs((prev) => ({ ...prev, [key]: value }));
+  // Logic: Current Stock determination
+  const currentStock = selectedVariant?.stock ?? 0;
+  const isOutOfStock =
+    product?.variants && product.variants.length > 0
+      ? !selectedVariant || currentStock <= 0
+      : false;
+
+  const displayImage = selectedVariant?.imageUrl || product?.imageUrl || "";
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    addItem({
+      variantId: selectedVariant?.id,
+      productId: product.id,
+      name: product.name,
+      price: selectedVariant?.price || product.basePrice,
+      image: displayImage,
+      attributes: selectedAttrs,
+      quantity: quantity,
+      stock: currentStock,
+    });
+
+    setIsCartOpen(true);
+    toast.success("Added to Bag", {
+      description: `${quantity}x ${product.name} added successfully.`,
+    });
+  };
+
+  const handleImageClick = (clickedImageUrl: string) => {
+    const matchingVariant = product?.variants?.find(
+      (v) => v.imageUrl === clickedImageUrl,
+    );
+    if (matchingVariant) {
+      setSelectedAttrs(matchingVariant.attributes as Record<string, string>);
+    }
   };
 
   if (isLoading) return <ProductDetailSkeleton />;
   if (isError || !product)
     return <div className="text-center py-20">Product not found.</div>;
 
-  const currentPrice = selectedVariant
-    ? `$${selectedVariant.price}`
-    : product.basePrice > 0
-      ? `$${product.basePrice}`
-      : "Contact for Price";
-
   return (
-    <div className="container mx-auto py-10 px-4 md:px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Left: Images */}
-        <ImageGallery
-          images={[
-            product.imageUrl || "",
-            ...(product.variants
-              ?.map((v) => v.imageUrl)
-              .filter(Boolean) as string[]),
-          ]}
-        />
+    <div className="min-h-screen bg-background pb-20">
+      <div className="container mx-auto py-12 px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          <div className="lg:col-span-7">
+            <div className="sticky top-28">
+              <ImageGallery
+                selectedImage={displayImage}
+                onImageClick={handleImageClick}
+                images={[
+                  product.imageUrl || "",
+                  ...(product.variants
+                    ?.map((v) => v.imageUrl)
+                    .filter(Boolean) as string[]),
+                ]}
+              />
+            </div>
+          </div>
 
-        {/* Right: Info & Actions */}
-        <div className="flex flex-col space-y-8">
-          <ProductInfo
-            name={product.name}
-            description={product.description || ""}
-            price={currentPrice}
-          />
+          <div className="lg:col-span-5 flex flex-col space-y-8">
+            <div className="space-y-4">
+              <Badge
+                variant="secondary"
+                className="rounded-full px-4 py-1 uppercase tracking-widest text-[10px]"
+              >
+                {product.categoryName || "Premium Collection"}
+              </Badge>
+              <ProductInfo
+                name={product.name}
+                description={product.description || ""}
+                price={
+                  selectedVariant
+                    ? `$${selectedVariant.price}`
+                    : `$${product.basePrice}`
+                }
+                sku={selectedVariant?.sku}
+                category={product.categoryName}
+              />
+            </div>
 
-          {product.variants && product.variants.length > 0 && (
-            <VariantSelector
-              variants={product.variants}
-              selectedAttributes={selectedAttrs}
-              onChange={handleAttrChange}
-            />
-          )}
+            <Separator className="opacity-50" />
 
-          <div className="pt-6 space-y-4">
-            <Button
-              size="lg"
-              className="w-full text-lg h-14"
-              disabled={
-                product.variants &&
-                product.variants.length > 0 &&
-                !selectedVariant
-              }
-            >
-              {selectedVariant ? "Add to Cart" : "Select Options"}
-            </Button>
+            {product.variants && product.variants.length > 0 && (
+              <VariantSelector
+                variants={product.variants}
+                selectedAttributes={selectedAttrs}
+                onChange={(k: string, v: string) => {
+                  // Explicitly define types here
+                  setSelectedAttrs((prev) => ({ ...prev, [k]: v }));
+                  setQuantity(1);
+                }}
+              />
+            )}
 
-            {selectedVariant &&
-              selectedVariant.stock !== undefined &&
-              selectedVariant.stock <= 5 && (
-                <p className="text-orange-500 text-sm font-medium">
-                  Only {selectedVariant.stock} left in stock!
-                </p>
+            <div className="pt-4 space-y-6">
+              <div className="flex items-center gap-4">
+                {/* --- QUANTITY COUNTER --- */}
+                <div className="flex items-center border-2 rounded-full p-1 bg-muted/20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-10 w-10"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    disabled={isOutOfStock}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="w-10 text-center font-bold">{quantity}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-10 w-10"
+                    onClick={() => setQuantity((q) => q + 1)}
+                    disabled={isOutOfStock || quantity >= currentStock}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <Button
+                  size="lg"
+                  className="flex-1 h-14 rounded-full shadow-lg"
+                  disabled={
+                    isOutOfStock ||
+                    ((product.variants?.length ?? 0) > 0 && !selectedVariant)
+                  }
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  {isOutOfStock ? "Out of Stock" : `Add to Bag`}
+                </Button>
+              </div>
+
+              {/* Stock Warning Logic */}
+              {selectedVariant && (
+                <div className="text-center">
+                  {currentStock <= 0 ? (
+                    <p className="text-destructive font-bold text-sm uppercase">
+                      Currently Unavailable
+                    </p>
+                  ) : quantity >= currentStock ? (
+                    <p className="text-orange-600 font-bold text-[10px] uppercase">
+                      Maximum Stock Reached
+                    </p>
+                  ) : (
+                    currentStock <= 5 && (
+                      <p className="text-destructive text-xs font-bold animate-pulse">
+                        Only {currentStock} units left!
+                      </p>
+                    )
+                  )}
+                </div>
               )}
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <Truck className="h-5 w-5 text-primary" />
+                  <span className="text-[10px] font-bold uppercase">
+                    Express Delivery
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  <span className="text-[10px] font-bold uppercase">
+                    Safe Payment
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ProductDetailSkeleton() {
-  return (
-    <div className="container mx-auto py-10 px-4 grid grid-cols-1 md:grid-cols-2 gap-12">
-      <Skeleton className="aspect-3/4 w-full rounded-xl" />
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-3/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-32 w-full" />
-        <div className="flex gap-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
-          <Skeleton className="h-12 w-12 rounded-full" />
-        </div>
-        <Skeleton className="h-14 w-full" />
-      </div>
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 }

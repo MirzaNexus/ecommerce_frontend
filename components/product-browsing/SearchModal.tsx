@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  Command, // Import the base Command component
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -12,7 +13,6 @@ import {
 
 import { useProductSearch } from "@/hooks/productBrowsing.ts/useProductSearch";
 import { SearchResultItem } from "./SearchResultItem";
-
 import { useRouter } from "next/navigation";
 
 export const SearchModal = () => {
@@ -38,27 +38,34 @@ export const SearchModal = () => {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput
-        placeholder="Search products..."
-        value={searchTerm}
-        onValueChange={setSearchTerm}
-      />
-      <CommandList>
-        {isLoading && (
-          <div className="p-4 text-center text-sm">Searching...</div>
-        )}
-        <CommandEmpty>No products found.</CommandEmpty>
-        <CommandGroup heading="Products">
-          {data?.map((product) => (
-            <CommandItem
-              key={product.id}
-              onSelect={() => handleSelect(product.slug)}
-            >
-              <SearchResultItem product={product} onClick={() => {}} />
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
+      {/* FIX: We wrap the interior in <Command>. 
+          Some Shadcn versions require this to initialize the cmdk store 
+          properly inside a Dialog.
+      */}
+      <Command className="rounded-lg border shadow-md md:min-w-[450px]">
+        <CommandInput
+          placeholder="Search products..."
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
+        <CommandList>
+          {isLoading && (
+            <div className="p-4 text-center text-sm">Searching...</div>
+          )}
+          <CommandEmpty>No products found.</CommandEmpty>
+          <CommandGroup heading="Products">
+            {data?.map((product) => (
+              <CommandItem
+                key={product.id}
+                value={product.name} // Important: cmdk uses 'value' for internal filtering
+                onSelect={() => handleSelect(product.id)}
+              >
+                <SearchResultItem product={product} onClick={() => {}} />
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 };
