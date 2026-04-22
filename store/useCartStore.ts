@@ -17,11 +17,13 @@ interface CartStore {
   addItem: (item: CartItem) => void;
   updateQuantity: (id: string, qty: number) => void;
   removeItem: (id: string) => void;
+  getTotalPrice: () => number;
+  clearCart: () => void;
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
       addItem: (newItem) =>
         set((state) => {
@@ -58,6 +60,14 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: state.items.filter((i) => (i.variantId || i.productId) !== id),
         })),
+      clearCart: () => set({ items: [] }),
+
+      getTotalPrice: () => {
+        return get().items.reduce(
+          (acc, item) => acc + item.price * item.quantity,
+          0,
+        );
+      },
     }),
     { name: "shopping-cart" },
   ),

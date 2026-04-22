@@ -13,6 +13,7 @@ import {
   LogOut,
   ShieldCheck,
   ChevronRight,
+  ShoppingBag,
 } from "lucide-react";
 
 type Item = {
@@ -26,6 +27,7 @@ const iconMap: Record<string, any> = {
   Products: Package,
   Categories: Layers,
   Users: Users,
+  Orders: ShoppingBag,
   Settings: Settings,
 };
 

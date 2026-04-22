@@ -8,6 +8,7 @@ const sidebarItems = [
   { name: "Users", href: "/admin/users" },
   { name: "Categories", href: "/admin/categories" },
   { name: "Products", href: "/admin/products" },
+  { name: "Orders", href: "/admin/orders" },
 ];
 
 export default function AdminLayout({

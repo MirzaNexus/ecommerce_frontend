@@ -10,6 +10,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CartDrawer({
   isOpen,
@@ -19,6 +20,12 @@ export function CartDrawer({
   onClose: () => void;
 }) {
   const { items, updateQuantity, removeItem } = useCartStore();
+  const router = useRouter(); // Initialize router
+
+  const handleCheckout = () => {
+    onClose(); // Close drawer first
+    router.push("/checkout"); // Redirect to checkout page
+  };
 
   const total = items.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -147,7 +154,11 @@ export function CartDrawer({
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
-          <Button className="w-full h-14 rounded-full font-bold shadow-xl">
+          <Button
+            onClick={handleCheckout}
+            disabled={items.length === 0}
+            className="w-full h-14 rounded-full font-bold shadow-xl"
+          >
             Checkout Securely
           </Button>
         </div>
