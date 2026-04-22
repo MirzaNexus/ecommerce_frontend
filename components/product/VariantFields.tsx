@@ -42,7 +42,7 @@ export default function VariantFields() {
 
           {/* IMAGE */}
           <ImageUpload
-            onChange={(file: File | null) =>
+            onChange={(file: File | undefined) =>
               setValue(`variants.${index}.image`, file)
             }
           />

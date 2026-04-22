@@ -38,8 +38,8 @@ export const SearchModal = () => {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      {/* FIX: We wrap the interior in <Command>. 
-          Some Shadcn versions require this to initialize the cmdk store 
+      {/* FIX: We wrap the interior in <Command>.
+          Some Shadcn versions require this to initialize the cmdk store
           properly inside a Dialog.
       */}
       <Command className="rounded-lg border shadow-md md:min-w-[450px]">

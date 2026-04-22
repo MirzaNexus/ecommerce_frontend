@@ -6,6 +6,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,9 @@ export function CartDrawer({
           {" "}
           {/* 2. shrink-0 prevents header from disappearing */}
           <SheetTitle className="flex items-center gap-2 font-heading">
+            <SheetDescription className="sr-only">
+              Review the items in your bag before checkout.
+            </SheetDescription>
             <ShoppingBag className="h-5 w-5 text-primary" />
             Shopping Bag ({items.length})
           </SheetTitle>

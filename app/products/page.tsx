@@ -151,15 +151,56 @@ export default function ProductsPage() {
                 )}
 
                 {/* Pagination Placeholder - Premium apps often use 'Load More' or subtle pagination */}
+                {/* --- PAGINATION SECTION --- */}
                 {data && data.meta.totalPages > 1 && (
-                  <div className="mt-20 flex justify-center">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="px-12 rounded-full border-primary/20 hover:bg-primary/5"
-                    >
-                      Load More Products
-                    </Button>
+                  <div className="mt-20 flex flex-col items-center gap-6">
+                    <div className="flex items-center gap-4">
+                      {/* ⬅️ Previous Button */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="px-8 rounded-full border-primary/20 hover:bg-primary/5 font-black uppercase tracking-widest text-[10px] italic transition-all active:scale-95 disabled:opacity-30"
+                        // Sirf tab dikhayen ya enable rakhen jab current page 1 se bara ho
+                        onClick={() => {
+                          const currentPage = filters.page ?? 1;
+                          if (currentPage > 1) {
+                            updateParams({ page: currentPage - 1 });
+                          }
+                        }}
+                        disabled={isLoading || (filters.page ?? 1) <= 1}
+                      >
+                        Previous
+                      </Button>
+
+                      {/* Page Indicator (Optional - Look premium) */}
+                      <div className="text-[10px] font-black uppercase tracking-widest bg-slate-100 px-4 py-2 rounded-full italic">
+                        Page {data.meta.page} of {data.meta.totalPages}
+                      </div>
+
+                      {/* ➡️ Next Button (Load More) */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="px-8 rounded-full border-primary/20 hover:bg-primary/5 font-black uppercase tracking-widest text-[10px] italic transition-all active:scale-95 shadow-sm"
+                        onClick={() => {
+                          const currentPage = filters.page ?? 1;
+                          if (currentPage < data.meta.totalPages) {
+                            updateParams({ page: currentPage + 1 });
+                          }
+                        }}
+                        disabled={
+                          isLoading || data.meta.page === data.meta.totalPages
+                        }
+                      >
+                        {isLoading ? "Loading..." : "Next"}
+                      </Button>
+                    </div>
+
+                    {/* Subtle indicator for total items */}
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter italic">
+                      Showing {data.data.length} of {data.meta.total} Premium
+                      Products
+                    </p>
                   </div>
                 )}
               </>
