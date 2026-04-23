@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ShoppingBag,
 } from "lucide-react";
+import { useLogout } from "@/hooks/auth/useLogout";
 
 type Item = {
   name: string;
@@ -34,11 +35,16 @@ const iconMap: Record<string, any> = {
 export default function DashboardSidebar({ items }: { items: Item[] }) {
   const pathname = usePathname();
   const [userRole, setUserRole] = useState("Panel");
+  const logout = useLogout();
 
   useEffect(() => {
     const role = Cookies.get("role");
     setUserRole(role || "admin");
   }, []);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <>
@@ -121,9 +127,7 @@ export default function DashboardSidebar({ items }: { items: Item[] }) {
         {/* Footer: Log Out / Help */}
         <div className="mt-auto pt-6 border-t border-slate-50">
           <button
-            onClick={() => {
-              /* Logout logic */
-            }}
+            onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-rose-500 font-bold text-sm hover:bg-rose-50 transition-colors"
           >
             <LogOut size={18} />

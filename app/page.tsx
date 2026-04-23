@@ -1,5 +1,6 @@
 import { Hero } from "@/components/home/Hero";
-import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { ProductSlider } from "@/components/home/FeaturedProducts";
+import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 
 export default function HomePage() {
   return (
@@ -8,21 +9,33 @@ export default function HomePage() {
       <Hero />
 
       {/* 2. Brand Marquee (Quick visual) */}
-      <div className="py-12 border-b border-slate-100">
-        <div className="flex justify-around opacity-30 grayscale pointer-events-none overflow-hidden whitespace-nowrap font-black italic text-4xl uppercase tracking-widest">
-          <span>Urban</span> <span>Modern</span> <span>Classic</span>{" "}
-          <span>Vibe</span>
-        </div>
-      </div>
+      <CategoryMarquee />
 
       {/* 3. Featured Products Section */}
-      <FeaturedProducts />
+      {/* Section 1 */}
+      <ProductSlider
+        title="Trending Now"
+        badgeText="Popular"
+        subtitle="The pieces everyone is talking about right now."
+        initialFilters={{ sortBy: "trending" }}
+      />
+
+      {/* Section 2 */}
+      <ProductSlider
+        title="New Arrivals"
+        badgeText="Fresh Drop"
+        subtitle="Just landed in our warehouse. Exclusive modular styles."
+        initialFilters={{ sortBy: "newest" }}
+      />
 
       {/* 4. Mini Promo Banner */}
-      <section className="my-12 bg-indigo-600 rounded-[2rem] p-12 relative overflow-hidden">
+      <section
+        id="newsletter-section"
+        className="my-12 bg-indigo-600 rounded-[2rem] p-12 relative overflow-hidden"
+      >
         <div className="relative z-10 text-center">
           <h3 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-4">
-            Get 20% Off Your First Order
+            Get Your First Order
           </h3>
           <p className="text-indigo-100 mb-6 font-medium">
             Join the Clothify squad and stay ahead of the trends.
