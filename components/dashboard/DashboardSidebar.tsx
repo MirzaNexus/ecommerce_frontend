@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronRight,
   ShoppingBag,
+  Megaphone,
 } from "lucide-react";
 import { useLogout } from "@/hooks/auth/useLogout";
 
@@ -29,6 +30,7 @@ const iconMap: Record<string, any> = {
   Categories: Layers,
   Users: Users,
   Orders: ShoppingBag,
+  Newsletter: Megaphone,
   Settings: Settings,
 };
 

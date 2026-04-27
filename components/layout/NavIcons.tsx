@@ -112,6 +112,7 @@ import Link from "next/link";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { CartDrawer } from "../product-browsing/CartDrawer";
 import { useCartStore } from "@/store/useCartStore";
+import { NavNotificationIcon } from "../newsletter/NavNotificationIcon";
 
 type NavIconsProps = Readonly<{
   loggedIn?: boolean;
@@ -183,6 +184,9 @@ export default function NavIcons({ loggedIn }: NavIconsProps) {
       >
         <Search size={20} />
       </Button>
+
+      {/* 🟢 🔔 Notification Icon (Placed here for high visibility) */}
+      <NavNotificationIcon />
 
       {/* 👤 Profile Section */}
       <div className="relative" ref={dropdownRef}>
