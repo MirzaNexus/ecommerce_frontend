@@ -16,8 +16,7 @@ export const registerSchema = z.object({
 
   phone: z
     .string()
-    .regex(/^(\+92|0)?3\d{9}$/, "Invalid Pakistani phone number")
-    .optional(),
+    .regex(/^(\+92|0)?3\d{9}$/, "Invalid Pakistani phone number"),
 
   password: z.string().min(8, "Password must be at least 8 characters"),
 });

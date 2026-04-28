@@ -61,3 +61,24 @@ get http://localhost:3000/admin/users/51ae106e-16c9-4207-9b55-f353cf35bbd2
 patch http://localhost:3000/admin/users/51ae106e-16c9-4207-9b55-f353cf35bbd2/status
 
  -->
+
+<!--
+
+Goal: Deliver a clean, scalable, production-ready Category Module frontend that integrates seamlessly with the existing backend and frontend dashboard / desgin system.
+
+🧠 11. WHAT I WILL DO (WHEN YOU GIVE TASKS)
+
+I will:
+
+✅ Phase 1
+Types + schemas (very important)
+✅ Phase 2
+Service layer (FormData ready)
+✅ Phase 3
+Hooks (aligned with your custom hooks)
+✅ Phase 4
+Form (RHF + dynamic variants)
+✅ Phase 5
+Table + pagination
+✅ Phase 6
+Edge cases + optimization -->

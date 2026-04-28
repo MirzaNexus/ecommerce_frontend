@@ -6,6 +6,10 @@ import { useAuthStore } from "@/store/authStore";
 const sidebarItems = [
   { name: "Dashboard", href: "/admin/dashboard" },
   { name: "Users", href: "/admin/users" },
+  { name: "Categories", href: "/admin/categories" },
+  { name: "Products", href: "/admin/products" },
+  { name: "Orders", href: "/admin/orders" },
+  { name: "Newsletter", href: "/admin/newsletter" },
 ];
 
 export default function AdminLayout({
