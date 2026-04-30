@@ -28,6 +28,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
       variantId: "",
       name: product.name,
       price: product.minPrice,
+      categoryId: product.categoryId,
       image: product.imageUrl || "/placeholder-product.png",
       quantity: 1,
       stock: 50,

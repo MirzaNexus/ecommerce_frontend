@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, use } from "react";
+import React, { useState, useEffect, useMemo, use } from "react";
 import { useProduct } from "@/hooks/product/useProduct";
 import { useCartStore } from "@/store/useCartStore"; // Import Store
 import { ImageGallery } from "@/components/product-browsing/ImageGallery";
@@ -13,6 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Minus, Plus, ShoppingBag, ShieldCheck, Truck } from "lucide-react";
 import { toast } from "sonner";
+import { useTrackRecommendation } from "@/hooks/recomndation/useRecommendation";
+import { useAuthStore } from "@/store/authStore";
+import { RelatedProductsSlider } from "@/components/recomendation/RelatedProductsSlider";
+import { RecommendationEventType } from "@/types/recomendation.types";
+import { v4 as uuidv4 } from "uuid";
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -22,6 +27,33 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const unwrappedParams = use(params);
   const id = unwrappedParams.id;
   const { data: product, isLoading, isError } = useProduct(id);
+
+  const { mutate: trackEvent } = useTrackRecommendation();
+  const userId = useAuthStore((s) => s.user?.id);
+
+  // 1. Automatic View Tracking
+  useEffect(() => {
+    if (product && userId) {
+      trackEvent({
+        user_id: userId,
+        product_id: product.id,
+        category_id: product.categoryId,
+        event_type: RecommendationEventType.VIEW,
+        price_at_event: product.basePrice,
+        idempotency_key: uuidv4(),
+        quantity: 1, // Explicitly pass for VIEW
+        algolia_payload: {
+          eventName: "Product Viewed",
+          index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || "",
+          userToken: userId,
+          objectIDs: [product.id],
+          timestamp: Date.now(),
+        },
+      });
+    }
+  }, [product?.id, userId, trackEvent]);
+  // --- RECOMMENDATION LOGIC END ---
+
   const addItem = useCartStore((state) => state.addItem);
 
   const [quantity, setQuantity] = useState(1);
@@ -56,12 +88,33 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       variantId: selectedVariant?.id,
       productId: product.id,
       name: product.name,
+      categoryId: product.categoryId,
       price: selectedVariant?.price || product.basePrice,
       image: displayImage,
       attributes: selectedAttrs,
       quantity: quantity,
       stock: currentStock,
     });
+
+    // --- TRACKING: ADD TO CART ---
+    if (userId) {
+      trackEvent({
+        user_id: userId,
+        product_id: product.id,
+        category_id: product.categoryId,
+        event_type: RecommendationEventType.ADD_TO_CART,
+        price_at_event: selectedVariant?.price || product.basePrice,
+        idempotency_key: uuidv4(),
+        quantity: quantity, // Real quantity from state
+        algolia_payload: {
+          eventName: "Added to Cart",
+          index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || "",
+          userToken: userId,
+          objectIDs: [product.id],
+          timestamp: Date.now(),
+        },
+      });
+    }
 
     setIsCartOpen(true);
     toast.success("Added to Bag", {
@@ -215,6 +268,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         </div>
       </div>
+
+      {product && (
+        <RelatedProductsSlider
+          productId={product.id}
+          categoryId={product.categoryId}
+          title="Recommended For You"
+          badgeText="Based on your interest"
+        />
+      )}
 
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
