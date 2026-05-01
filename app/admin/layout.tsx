@@ -9,6 +9,7 @@ const sidebarItems = [
   { name: "Categories", href: "/admin/categories" },
   { name: "Products", href: "/admin/products" },
   { name: "Orders", href: "/admin/orders" },
+  { name: "Settings", href: "/admin/recommendations" },
   { name: "Newsletter", href: "/admin/newsletter" },
 ];
 

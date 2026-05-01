@@ -28,7 +28,7 @@ const editCoreSchema = z.object({
   basePrice: z.coerce.number().min(0),
   slug: z.string().min(3, "Slug is required"),
   status: z.nativeEnum(ProductStatus),
-  mainImage: z.any().optional(),
+  image: z.any().optional(),
 });
 
 type EditCoreValues = z.infer<typeof editCoreSchema>;
@@ -70,17 +70,10 @@ export default function ProductEditForm({
 
   return (
     <Form {...form}>
-      {/* Main Container: 
-          1. flex flex-col to separate the body from the footer 
-          2. max-h-[80vh] ensures it never hits the absolute top/bottom of the screen 
-      */}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col max-h-[85vh]"
       >
-        {/* Scrollable Body: 
-            This div takes up the available space and handles the overflow 
-        */}
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           <div className="space-y-6 py-4 px-1">
             {/* Row 1: Basic Info */}
@@ -116,7 +109,7 @@ export default function ProductEditForm({
             {/* Row 2: Image Section (Standalone for better spacing) */}
             <FormField
               control={form.control}
-              name="mainImage"
+              name="image"
               render={({ field, fieldState }) => (
                 <FormItem className="bg-muted/30 p-4 rounded-xl border border-dashed border-border">
                   <FormLabel>Product Image</FormLabel>
@@ -140,9 +133,7 @@ export default function ProductEditForm({
                             ? field.value[0]
                             : field.value
                         }
-                        onChange={(file) =>
-                          field.onChange(file ? [file] : undefined)
-                        }
+                        onChange={(file) => field.onChange(file || undefined)}
                         error={fieldState.error?.message}
                       />
                     </div>

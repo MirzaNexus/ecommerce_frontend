@@ -7,6 +7,7 @@ import { ProductCard } from "../product-browsing/ProductCard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
 interface RelatedProductsSliderProps {
   productId: string;
@@ -118,10 +119,9 @@ export function RelatedProductsSlider({
         >
           {isLoading
             ? [...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-[480px] w-full bg-slate-50 animate-pulse rounded-[2.5rem] border border-slate-100"
-                />
+                <div key={i} className="w-full">
+                  <ProductCardSkeleton />
+                </div>
               ))
             : data?.items.map((product) => (
                 <div

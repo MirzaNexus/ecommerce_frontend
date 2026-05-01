@@ -105,6 +105,59 @@ export function ProductSlider({
               </Button>
             </Link>
           </div>
+
+          {/* Controls - Updated with Disable Logic */}
+          {/* {totalPages > 1 && (
+            <div className="flex items-center gap-5">
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePrev}
+                  disabled={totalPages <= 1}
+                  className={cn(
+                    "group p-4 rounded-full border border-slate-200 transition-all duration-500",
+                    totalPages <= 1
+                      ? "opacity-30 cursor-not-allowed border-slate-100"
+                      : "hover:bg-slate-950",
+                  )}
+                >
+                  <ChevronLeft
+                    size={22}
+                    className={cn(
+                      "transition-colors",
+                      totalPages > 1 && "group-hover:text-white",
+                    )}
+                  />
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={totalPages <= 1}
+                  className={cn(
+                    "group p-4 rounded-full border border-slate-200 transition-all duration-500",
+                    totalPages <= 1
+                      ? "opacity-30 cursor-not-allowed border-slate-100"
+                      : "hover:bg-slate-950",
+                  )}
+                >
+                  <ChevronRight
+                    size={22}
+                    className={cn(
+                      "transition-colors",
+                      totalPages > 1 && "group-hover:text-white",
+                    )}
+                  />
+                </button>
+              </div>
+
+              <Link href={`/products?sortBy=${initialFilters.sortBy}`}>
+                <Button
+                  variant="ghost"
+                  className="h-auto p-0 pb-1 text-xs font-black uppercase italic tracking-[0.2em] border-b-2 border-indigo-600 rounded-none hover:bg-transparent hover:text-indigo-600 transition-all"
+                >
+                  View All <ArrowRight size={14} className="ml-2" />
+                </Button>
+              </Link>
+            </div>
+          )} */}
         </div>
 
         {/* Product Grid - Theming Restored */}
