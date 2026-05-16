@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -164,6 +165,9 @@ export const GuidedChatWidget = () => {
               <Sparkles className="w-5 h-5 text-yellow-400" />
               AI Shopping Assistant
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Dialog description for screen readers.
+            </DialogDescription>
           </DialogHeader>
 
           {/* Messages Area: FIX 2 - Proper Flex containment */}
