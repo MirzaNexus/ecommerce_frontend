@@ -82,3 +82,22 @@ Form (RHF + dynamic variants)
 Table + pagination
 ✅ Phase 6
 Edge cases + optimization -->
+
+<!--
+
+Hum Frontend Ek system Metetical Processs Ky Through Banan gy
+ek singl response mein sirf ek phase ka code immplment karna hy
+after ask me to proceed to 2 phase and so on...
+
+Phase 1- Create Frontend interfaces / Types & Zod Validation for body data ( where needed ) for Backend Response and Request data send karny ky lye Based on Backend DTOS
+
+Phase 2- Create a Serivce Cenralized API Files for Recommedations API
+
+Phase 3- Build Costume Hooks for Busines Logic Immplemntation and Acalling mutaiona / Queary Hooks
+
+Phase 4 - Build All Requird Componnts and Use Custome Hooks inside it for Data Passing
+
+Phase 5 - Build Required Pages and calling Components inside the Pages / Coustome Hooks (if needed)
+
+Phase 6 - Optimizations and Analysis That All Commponents Are Workign Perfectly, Relaible, Optimizaed, Production Ready
+ -->

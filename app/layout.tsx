@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { AuthInitializer } from "@/components/user/auth/AuthInitializer";
 import "./globals.css";
 import { SearchModal } from "@/components/product-browsing/SearchModal";
+import { GuidedChatWidget } from "@/components/shopping-guided/GuidedChatWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,9 +37,10 @@ export default function RootLayout({
         <Providers>
           <AuthInitializer>
             <Header />
-            <main className="min-h-screen">
+            <main className="min-h-screen overflow-x-hidden">
               {children}
               <SearchModal />
+              <GuidedChatWidget />
             </main>
             <Footer />
           </AuthInitializer>

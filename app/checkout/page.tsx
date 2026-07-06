@@ -1,6 +1,10 @@
 "use client";
 
 import { useCartStore } from "@/store/useCartStore"; // Your existing store
+import { useTrackRecommendation } from "@/hooks/recomndation/useRecommendation";
+import { RecommendationEventType } from "@/types/recomendation.types";
+import { useAuthStore } from "@/store/authStore";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   CheckoutFormValues,
@@ -15,6 +19,8 @@ export default function CheckoutPage() {
   const { items: cartItems, getTotalPrice } = useCartStore(); // Using your store
   const totalPrice = getTotalPrice(); // Get total price from the store
   const { checkout, isSubmitting } = useOrder();
+  const { mutate: trackEvent } = useTrackRecommendation();
+  const userId = useAuthStore((s) => s.user?.id);
 
   // Mapping your Store items to the Backend DTO structure
   const methods = useForm<CheckoutFormValues>({
@@ -29,7 +35,26 @@ export default function CheckoutPage() {
   });
 
   const onSubmit = (data: CheckoutFormValues) => {
-    // This triggers the useOrder hook: Checkout -> Stripe Session -> Redirect
+    if (userId && cartItems.length > 0) {
+      cartItems.forEach((item) => {
+        trackEvent({
+          user_id: userId,
+          product_id: item.productId,
+          category_id: item?.categoryId || "",
+          event_type: RecommendationEventType.PAID_ORDER,
+          price_at_event: item.price,
+          quantity: item.quantity,
+          idempotency_key: uuidv4(),
+          algolia_payload: {
+            eventName: "Order Completed",
+            index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || "",
+            userToken: userId,
+            objectIDs: [item.productId],
+            timestamp: Date.now(),
+          },
+        });
+      });
+    }
     checkout(data);
   };
 

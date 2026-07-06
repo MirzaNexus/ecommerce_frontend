@@ -8,6 +8,11 @@ import { ShoppingBag, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/useCartStore";
 import { CartDrawer } from "./CartDrawer";
+import { RecommendationEventType } from "@/types/recomendation.types";
+import { v4 as uuidv4 } from "uuid";
+import { useTrackRecommendation } from "@/hooks/recomndation/useRecommendation";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: BuyerProductResponse;
@@ -16,6 +21,8 @@ interface ProductCardProps {
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const { mutate: trackEvent } = useTrackRecommendation();
+  const userId = useAuthStore((s) => s.user?.id);
 
   const isSinglePrice = product.minPrice === product.maxPrice;
 
@@ -28,13 +35,37 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
       variantId: "",
       name: product.name,
       price: product.minPrice,
+      categoryId: product.categoryId,
       image: product.imageUrl || "/placeholder-product.png",
       quantity: 1,
       stock: 50,
       attributes: { category: product.categoryName },
     });
 
+    if (userId) {
+      trackEvent({
+        user_id: userId,
+        product_id: product.id,
+        category_id: product.categoryId,
+        event_type: RecommendationEventType.ADD_TO_CART,
+        price_at_event: product.minPrice,
+        idempotency_key: uuidv4(),
+        quantity: 1,
+        algolia_payload: {
+          eventName: "Added to Cart from Listing",
+          index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || "",
+          userToken: userId,
+          objectIDs: [product.id],
+          timestamp: Date.now(),
+        },
+      });
+    }
+
     setIsDrawerOpen(true);
+
+    toast.success("Added to Bag", {
+      description: `${product.name} has been added to your bag.`,
+    });
   };
 
   return (

@@ -6,15 +6,23 @@ import {
   LayoutDashboard,
   TrendingUp,
   ArrowRight,
+  ArrowUpRight,
+  Zap,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import { StatCard } from "@/components/shared/StatCard";
 import { useDashboardStats } from "@/hooks/dashboard/useDashboardStats";
 import { Button } from "@/components/ui/button";
+import { useAdminRecommendationMetrics } from "@/hooks/recomndation/useAdminRecommendation";
 import Link from "next/link";
 
 export default function AdminDashboard() {
-  const { stats, isLoading, isError } = useDashboardStats();
+  const { stats, isLoading: statsLoading, isError } = useDashboardStats();
+  const { data: recoMetrics, isLoading: recoLoading } =
+    useAdminRecommendationMetrics();
+
+  const isLoading = statsLoading || recoLoading;
 
   // --- Error State UI ---
   if (isError) {
@@ -99,6 +107,18 @@ export default function AdminDashboard() {
               colorClassName="text-blue-600 bg-blue-50"
             />
 
+            <StatCard
+              title="AI Engine Status"
+              value={recoMetrics?.last_sync ? "Healthy" : "Needs Sync"}
+              icon={Zap}
+              description={
+                recoMetrics?.last_sync
+                  ? "Sync is up to date"
+                  : "Re-index required"
+              }
+              colorClassName="text-indigo-600 bg-indigo-50"
+            />
+
             {/* Placeholder for future stats (e.g. Sales or Orders) */}
             <div className="hidden lg:flex bg-slate-50 border border-dashed border-slate-200 rounded-[2.5rem] items-center justify-center p-6">
               <div className="text-center space-y-1">
@@ -111,6 +131,92 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
+
+      {/* --- Section 3: Trending Affinities (Error-Free & Refined UI) --- */}
+      {!isLoading && recoMetrics?.top_categories && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white border-2 border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="text-xl font-black uppercase italic tracking-tighter text-slate-900">
+                  Trending Affinities
+                </h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                  Most engaged categories by user behavior
+                </p>
+              </div>
+              <TrendingUp className="text-indigo-500 h-6 w-6" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recoMetrics.top_categories.slice(0, 4).map((cat, index) => (
+                <div
+                  key={cat.categoryId || index}
+                  className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group hover:bg-indigo-600 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    {/* Rank Number */}
+                    <span className="text-lg font-black italic text-slate-300 group-hover:text-indigo-300 flex-shrink-0 transition-colors">
+                      0{index + 1}
+                    </span>
+
+                    <div className="flex flex-col min-w-0">
+                      {/* Main Category Name - Focus is here now */}
+                      <p className="font-bold text-slate-800 group-hover:text-white text-sm truncate transition-colors">
+                        {cat.categoryName || "Unknown Category"}
+                      </p>
+
+                      {/* Subtle ID for technical context */}
+                      <p className="font-medium text-slate-400 group-hover:text-indigo-200 uppercase text-[9px] tracking-tight truncate transition-colors">
+                        ID: {cat.categoryId?.split("-")[0]}...
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="text-right">
+                      <p className="text-xs font-black text-slate-900 group-hover:text-white leading-none transition-colors">
+                        {typeof cat.totalScore === "number"
+                          ? cat.totalScore.toFixed(1)
+                          : parseFloat((cat.totalScore as any) || 0).toFixed(1)}
+                        %
+                      </p>
+                      <p className="text-[8px] font-black uppercase text-slate-400 group-hover:text-indigo-100 transition-colors">
+                        Affinity
+                      </p>
+                    </div>
+
+                    <div className="p-1.5 bg-white group-hover:bg-indigo-500 rounded-lg transition-colors">
+                      <ArrowUpRight
+                        size={14}
+                        className="text-indigo-600 group-hover:text-white transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* AI Insight Sidebar */}
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col justify-center relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="bg-indigo-500/20 w-fit p-2 rounded-xl mb-4 border border-indigo-500/30">
+                <Sparkles size={20} className="text-indigo-400" />
+              </div>
+              <h4 className="text-2xl font-black italic uppercase leading-tight mb-4">
+                AI <br /> Insights
+              </h4>
+              <p className="text-slate-400 text-[11px] font-medium leading-relaxed">
+                These categories are currently driving the highest engagement
+                based on AI tracking. Use this to plan your next sale or
+                inventory restock.
+              </p>
+            </div>
+            {/* Aesthetic Glow */}
+            <div className="absolute -right-10 -bottom-10 h-40 w-40 bg-indigo-600/20 rounded-full blur-[80px]" />
+          </div>
+        </div>
+      )}
 
       {/* --- Section 3: Recent Activity / Next Steps (Visual Filler) --- */}
       {!isLoading && (
